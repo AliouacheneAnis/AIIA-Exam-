@@ -8,7 +8,8 @@
 */
 
 
-
+#include <iostream>
+#include <string>
 #include <MQTT.h>
 
 
@@ -37,14 +38,18 @@ void messageReceived(String &topic, String &payload) {
   DataRecu = " ";
   Serial.println("Message Recu");
   Serial.println(payload);
-  Method = payload.substring(9,payload.indexOf(",") - 1); 
+  Method = payload.substring(11,payload.indexOf(",") - 1); 
   Serial.println(Method);
   if (Method == "setValue")
   {
-    DataRecu = payload.substring(payload.lastIndexOf(":") - 1, payload.indexOf("}") - 1);
+    DataRecu = payload.substring(payload.lastIndexOf(":") + 1 , payload.indexOf("}") - 1);
+    intensite = DataRecu.toInt(); 
+    Serial.println(intensite);
+  }else if (Method == "Status"){
+
+    DataRecu = payload.substring(payload.lastIndexOf(":") + 2, payload.indexOf("}") - 1);
   }
   
-  DataRecu = payload.substring(payload.lastIndexOf(":") + 2, payload.indexOf("}") - 1);
 
   Serial.println(topic);
 
