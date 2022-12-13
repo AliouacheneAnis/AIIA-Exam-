@@ -1,0 +1,174 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "Notification",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 2,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 985,
+          "layoutY": 155
+        },
+        "type": "org.thingsboard.rule.engine.mail.TbMsgToEmailNode",
+        "name": "To Email",
+        "debugMode": true,
+        "configuration": {
+          "fromTemplate": "ido@ccnb.ca",
+          "toTemplate": "eaalioua01@monccnb.ca",
+          "ccTemplate": null,
+          "bccTemplate": null,
+          "subjectTemplate": "Notification Status Bouton ",
+          "mailBodyType": null,
+          "isHtmlTemplate": null,
+          "bodyTemplate": "Status des composantes est : ${Status}"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 986,
+          "layoutY": 289
+        },
+        "type": "org.thingsboard.rule.engine.mail.TbSendEmailNode",
+        "name": "Send email",
+        "debugMode": true,
+        "configuration": {
+          "useSystemSmtpSettings": true,
+          "smtpHost": "localhost",
+          "smtpPort": 25,
+          "username": null,
+          "password": null,
+          "smtpProtocol": "smtp",
+          "timeout": 10000,
+          "enableTls": false,
+          "tlsVersion": "TLSv1.2",
+          "enableProxy": false,
+          "proxyHost": null,
+          "proxyPort": null,
+          "proxyUser": null,
+          "proxyPassword": null
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 308,
+          "layoutY": 149
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Transfert de données au metadata",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var status =  \"\"; \nif (msg.Bouton1 == 1 && msg.Bouton2 == 0 && msg.Bouton3 == 0) {\n    status = \"Bouton1 : ON, Bouton2 : OFF, Bouton 3 : OFF , LED : ROUGE\" ;\n        msg.statusbtn = msg.Bouton1*100 + msg.Bouton2*10 + msg.Bouton3 ;\n}else if (msg.Bouton1 == 0 && msg.Bouton2 == 1 && msg.Bouton3 == 0) {\n    status = \"Bouton1 : OFF, Bouton2 : ON, Bouton 3 : OFF , LED : GREEN\" ;\n                 msg.statusbtn = msg.Bouton1*100 + msg.Bouton2*10 + msg.Bouton3;\n    }else if (msg.Bouton1 == 0 && msg.Bouton2 == 0 && msg.Bouton3 == 1) {\n        status = \"Bouton1 : OFF, Bouton2 : OFF, Bouton 3 : ON , LED : BLUE\" ;\n                 msg.statusbtn = msg.Bouton1*100 + msg.Bouton2*10 + msg.Bouton3; \n        }else if (msg.Bouton1 == 0 && msg.Bouton2 == 1 && msg.Bouton3 == 1) {\n            status = \"Bouton1 : OFF, Bouton2 : ON, Bouton 3 : ON , LED : GREN_NBLUE\" ;\n                 msg.statusbtn = msg.Bouton1*100 + msg.Bouton2*10 + msg.Bouton3;\n\n        }else if (msg.Bouton1 == 1 && msg.Bouton2 == 0 && msg.Bouton3 == 1) {\n            status = \"Bouton1 : ON, Bouton2 : OFF, Bouton 3 : ON , LED : ROUGE_BLUE\" ;\n                 msg.statusbtn = msg.Bouton1*100 + msg.Bouton2*10 + msg.Bouton3;\n\n        }else if (msg.Bouton1 == 1 && msg.Bouton2 == 1 && msg.Bouton3 == 0) {\n            status = \"Bouton1 : ON, Bouton2 : OFF, Bouton 3 : OFF , LED : ROUGE_GREEN\" ;\n                  msg.statusbtn = msg.Bouton1*100 + msg.Bouton2*10 + msg.Bouton3; \n\n        }else if (msg.Bouton1 == 1 && msg.Bouton2 == 1 && msg.Bouton3 == 1) {\n            status = \"Bouton1 : ON, Bouton2 : ON, Bouton 3 : ON , LED : ROUGE_GREEN_BLUE\" ;\n            \n                  msg.statusbtn = msg.Bouton1*100 + msg.Bouton2*10 + msg.Bouton3; \n        }\n\nmetadata.Btn = msg.statusbtn; \nmetadata.Status = status; \n\nreturn {msg: msg, metadata: metadata, msgType: msgType};\n"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 824,
+          "layoutY": 390
+        },
+        "type": "org.thingsboard.rule.engine.action.TbClearAlarmNode",
+        "name": "Arret Mode Alarme",
+        "debugMode": true,
+        "configuration": {
+          "alarmDetailsBuildJs": "var details = {};\nif (metadata.prevAlarmDetails) {\n    details = JSON.parse(metadata.prevAlarmDetails);\n}\nreturn details;",
+          "alarmType": "Haute Temperature"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 773,
+          "layoutY": 87
+        },
+        "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+        "name": "Instantiation Mode Alarme",
+        "debugMode": true,
+        "configuration": {
+          "alarmDetailsBuildJs": "var details = {};\nif (metadata.prevAlarmDetails) {\n    details = JSON.parse(metadata.prevAlarmDetails);\n}\nreturn details;",
+          "useMessageAlarmData": false,
+          "alarmType": "Haute Temperature",
+          "severity": "CRITICAL",
+          "propagate": false,
+          "relationTypes": []
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 560,
+          "layoutY": 139
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "Génération d'alarme",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "return msg.delta != 0; "
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 440,
+          "layoutY": 283
+        },
+        "type": "org.thingsboard.rule.engine.metadata.CalculateDeltaNode",
+        "name": "jjj",
+        "debugMode": true,
+        "configuration": {
+          "inputValueKey": "statusbtn",
+          "outputValueKey": "delta",
+          "useCache": true,
+          "addPeriodBetweenMsgs": false,
+          "periodValueKey": "periodInMs",
+          "round": null,
+          "tellFailureIfDeltaIsNegative": false
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 0,
+        "type": "Created"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 3,
+        "type": "False"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 4,
+        "type": "True"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 5,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
